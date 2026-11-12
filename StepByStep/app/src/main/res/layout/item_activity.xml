@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardHistoryItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_medium"
+    app:cardBackgroundColor="@color/card"
+    app:cardCornerRadius="@dimen/radius_medium"
+    app:strokeColor="@color/card_stroke"
+    app:strokeWidth="@dimen/border_thin">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_large">
+
+        <!-- หัวข้อประวัติ (เช่น 29 Oct 18:57) -->
+        <TextView
+            android:id="@+id/tvHistoryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="วันที่/เดือน/เวลา"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_heading_small"
+            android:textStyle="bold" />
+
+        <!-- วันที่และเวลาแบบเต็ม -->
+        <TextView
+            android:id="@+id/tvHistoryDateFull"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            tools:text="วันที่/เดือน/ปี • เวลา"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_small" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <!-- รายละเอียด ก้าว เขย่า เวลา อัตราเฉลี่ย -->
+            <TextView
+                android:id="@+id/tvHistoryDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="0 steps • 0 shakes • 00:00 • 0 steps/min"
+                android:textColor="@color/accent_blue_cyan"
+                android:textSize="13sp"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@+id/ic_arrow"
+                android:layout_alignParentStart="true"/>
+
+            <ImageView
+                android:id="@+id/ic_arrow"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@android:drawable/ic_media_play"
+                app:tint="@color/text_secondary"
+                android:rotation="0"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/badgeNewStep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/bg_badge_yellow"
+                app:cardCornerRadius="@dimen/radius_small"
+                app:strokeWidth="0dp"
+                android:layout_marginEnd="6dp"
+                android:visibility="visible"
+                tools:visibility="visible">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:text="@string/new_step_record"
+                    android:textColor="@color/accent_yellow"
+                    android:textSize="@dimen/text_xsmall"
+                    android:textStyle="bold" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/badgeNewShake"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/bg_badge_yellow"
+                app:cardCornerRadius="@dimen/radius_small"
+                app:strokeWidth="0dp"
+                android:visibility="visible"
+                tools:visibility="visible">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:text="@string/new_shake_record"
+                    android:textColor="@color/accent_yellow"
+                    android:textSize="@dimen/text_xsmall"
+                    android:textStyle="bold" />
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

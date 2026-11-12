@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">StepByStep</string>
+    <string name="app_subtitle">ติดตามจำนวนการก้าวเดินและคการเขย่าของคุณ</string>
+    <string name="current_session">CURRENT SESSION</string>
+    <string name="steps_title">STEPS</string>
+    <string name="shakes_title">SHAKES</string>
+    <string name="steps_unit">ก้าวเดิน</string>
+    <string name="shakes_unit">ครั้งที่เขย่า</string>
+
+    <string name="duration_label">ระยะเวลา</string>
+    <string name="steps_per_min_label">ก้าว/นาที</string>
+    <string name="shakes_per_min_label">เขย่า/นาที</string>
+
+    <string name="cumulative_history_title">ยอดสะสมจากประวัติ</string>
+    <string name="cumulative_history_value">--•--</string>
+    <string name="save_activity_btn">บันทึกกิจกรรม</string>
+
+    <string name="activity_history_title">ประวัติกิจกรรม</string>
+    <string name="new_step_record">NEW STEP RECORD</string>
+    <string name="new_shake_record">NEW SHAKE RECORD</string>
+</resources>

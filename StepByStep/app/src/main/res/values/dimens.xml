@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="space_zero">0dp</dimen>
+    <dimen name="screen_vertical_padding">50dp</dimen>
+    <dimen name="space_xsmall">4dp</dimen>
+    <dimen name="space_small">6dp</dimen>
+    <dimen name="space_small_plus">8dp</dimen>
+    <dimen name="space_medium">12dp</dimen>
+    <dimen name="space_card_small">14dp</dimen>
+    <dimen name="space_large">16dp</dimen>
+    <dimen name="space_xlarge">20dp</dimen>
+    <dimen name="radius_small">12dp</dimen>
+    <dimen name="radius_medium">18dp</dimen>
+    <dimen name="radius_large">22dp</dimen>
+    <dimen name="border_thin">1dp</dimen>
+    <dimen name="text_xsmall">11sp</dimen>
+    <dimen name="text_small">12sp</dimen>
+    <dimen name="text_body_small">13sp</dimen>
+    <dimen name="text_body">14sp</dimen>
+    <dimen name="text_heading_small">17sp</dimen>
+    <dimen name="text_heading">18sp</dimen>
+    <dimen name="text_value_medium">24sp</dimen>
+    <dimen name="text_value_large">27sp</dimen>
+    <dimen name="text_title">28sp</dimen>
+    <dimen name="text_value_xlarge">32sp</dimen>
+    <dimen name="radius_sensor_card">12dp</dimen>
+</resources>

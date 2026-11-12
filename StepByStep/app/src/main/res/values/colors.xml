@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="background">#0B1220</color>
+    <color name="card">#141F31</color>
+    <color name="card_stroke">#29384E</color>
+    <color name="text_primary">#F3F6FC</color>
+    <color name="text_secondary">#A6B3C7</color>
+
+    <!-- สีเน้นและสีเฉพาะส่วน -->
+    <color name="accent_green">#50E3A4</color>
+    <color name="accent_blue_cyan">#64D2D2</color>
+    <color name="accent_purple">#C59AFF</color>
+    <color name="accent_yellow">#FFD45C</color>
+
+    <color name="bg_steps_card">#14303A</color>
+    <color name="bg_shakes_card">#282346</color>
+    <color name="btn_teal">#167B80</color>
+    <color name="bg_badge_yellow">#33725814</color>
+</resources>

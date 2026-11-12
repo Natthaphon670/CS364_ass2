@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_large">
+
+        <!-- ==============================
+             ส่วนที่ 1: Header และ Timer
+             ============================== -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="@dimen/space_large">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_alignParentStart="true">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_title"
+                    android:textStyle="bold" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_subtitle"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/text_body" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- ==============================
+             ส่วนที่ 2: Current Session Card
+             ============================== -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@color/card"
+            app:cardCornerRadius="@dimen/radius_large"
+            app:strokeColor="@color/card_stroke"
+            app:strokeWidth="@dimen/border_thin">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/space_large">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/current_session"
+                    android:textColor="@color/accent_green"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/text_small" />
+
+                <!-- การ์ดจำนวนก้าวและเขย่า -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_medium"
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
+
+                    <!-- Steps -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="@dimen/space_small"
+                        app:cardBackgroundColor="@color/bg_steps_card"
+                        app:cardCornerRadius="@dimen/radius_medium"
+                        app:strokeWidth="0dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/space_medium">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/steps_title"
+                                android:textColor="@color/accent_blue_cyan"
+                                android:textStyle="bold" />
+                            <TextView
+                                android:id="@+id/tvCurrentSteps"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="-"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/text_value_xlarge"
+                                android:textStyle="bold" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/steps_unit"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="@dimen/text_small" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Shakes -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/space_small"
+                        app:cardBackgroundColor="@color/bg_shakes_card"
+                        app:cardCornerRadius="@dimen/radius_medium"
+                        app:strokeWidth="0dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/space_medium">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/shakes_title"
+                                android:textColor="@color/accent_purple"
+                                android:textStyle="bold"/>
+                            <TextView
+                                android:id="@+id/tvCurrentShakes"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                tools:text="-"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/text_value_xlarge"
+                                android:textStyle="bold" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/shakes_unit"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="@dimen/text_small" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+
+                <!-- อัตราเฉลี่ยและเวลา -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_large"
+                    android:orientation="horizontal">
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.2"
+                        android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="@string/duration_label" android:textColor="@color/text_secondary" android:textSize="@dimen/text_small"/>
+                        <TextView android:id="@+id/tvDurationRate" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            tools:text="--:--" android:textColor="@color/white" android:textSize="@dimen/text_heading" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="@string/steps_per_min_label" android:textColor="@color/text_secondary" android:textSize="@dimen/text_small"/>
+                        <TextView android:id="@+id/tvStepsPerMin" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            tools:text="-" android:textColor="@color/accent_blue_cyan" android:textSize="@dimen/text_heading" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="@string/shakes_per_min_label" android:textColor="@color/text_secondary" android:textSize="@dimen/text_small"/>
+                        <TextView android:id="@+id/tvShakesPerMin" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            tools:text="-" android:textColor="@color/accent_purple" android:textSize="@dimen/text_heading" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- ยอดสะสมจากประวัติ -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/cumulative_history_title"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/text_body" />
+                <TextView
+                    android:id="@+id/tvCumulativeHistory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="@dimen/space_large"
+                    tools:text="-"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_heading"
+                    android:textStyle="bold" />
+
+                <!-- ปุ่มบันทึกกิจกรรม -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSaveActivity"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="@dimen/space_large"
+                    android:text="@string/save_activity_btn"
+                    android:textSize="@dimen/text_heading_small"
+                    android:textColor="@color/white"
+                    app:cornerRadius="12dp"
+                    app:backgroundTint="@color/btn_teal" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ==============================
+             ส่วนที่ 3: ประวัติกิจกรรม (ดึงจาก DBHelper)
+             ============================== -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xlarge"
+            android:layout_marginBottom="@dimen/space_medium"
+            android:text="@string/activity_history_title"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- RecyclerView สำหรับแสดงประวัติที่บันทึกแล้ว -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvActivityHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_activity" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
