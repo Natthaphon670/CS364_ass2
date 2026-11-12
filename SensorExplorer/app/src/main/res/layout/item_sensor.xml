@@ -1,0 +1,29 @@
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_small_plus"
+    app:cardBackgroundColor="@color/card"
+    app:cardCornerRadius="@dimen/space_medium"
+    app:strokeColor="@color/card_stroke"
+    app:strokeWidth="@dimen/border_thin">
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/space_medium">
+        <TextView android:id="@+id/tvSensorName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sensor_name_placeholder"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold" />
+        <TextView android:id="@+id/tvSensorDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_xsmall"
+            android:text="@string/sensor_detail_placeholder"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_small" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
