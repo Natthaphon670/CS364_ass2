@@ -2,6 +2,7 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -96,14 +97,17 @@
                                 android:text="@string/steps_title"
                                 android:textColor="@color/accent_blue_cyan"
                                 android:textStyle="bold" />
+
                             <TextView
                                 android:id="@+id/tvCurrentSteps"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                tools:text="-"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/text_value_xlarge"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                android:text="0"
+                                tools:text="0" />
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -137,7 +141,8 @@
                                 android:id="@+id/tvCurrentShakes"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                tools:text="-"
+                                android:text="0"
+                                tools:text="0"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/text_value_xlarge"
                                 android:textStyle="bold" />
@@ -162,30 +167,66 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1.2"
                         android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="@string/duration_label" android:textColor="@color/text_secondary" android:textSize="@dimen/text_small"/>
-                        <TextView android:id="@+id/tvDurationRate" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            tools:text="--:--" android:textColor="@color/white" android:textSize="@dimen/text_heading" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/duration_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_small"/>
+                        <TextView
+                            android:id="@+id/tvDurationRate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            tools:text="00:00"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_heading"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp"/>
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="@string/steps_per_min_label" android:textColor="@color/text_secondary" android:textSize="@dimen/text_small"/>
-                        <TextView android:id="@+id/tvStepsPerMin" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            tools:text="-" android:textColor="@color/accent_blue_cyan" android:textSize="@dimen/text_heading" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/steps_per_min_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_small"/>
+                        <TextView
+                            android:id="@+id/tvStepsPerMin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            tools:text="0"
+                            android:textColor="@color/accent_blue_cyan"
+                            android:textSize="@dimen/text_heading"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp"/>
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            android:text="@string/shakes_per_min_label" android:textColor="@color/text_secondary" android:textSize="@dimen/text_small"/>
-                        <TextView android:id="@+id/tvShakesPerMin" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                            tools:text="-" android:textColor="@color/accent_purple" android:textSize="@dimen/text_heading" android:textStyle="bold" android:layout_marginTop="2dp"/>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/shakes_per_min_label"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_small"/>
+                        <TextView
+                            android:id="@+id/tvShakesPerMin"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            tools:text="0"
+                            android:textColor="@color/accent_purple"
+                            android:textSize="@dimen/text_heading"
+                            android:textStyle="bold"
+                            android:layout_marginTop="2dp"/>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -203,7 +244,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:layout_marginStart="@dimen/space_large"
-                    tools:text="-"
+                    android:text="0"
+                    tools:text="0"
                     android:textColor="@color/white"
                     android:textSize="@dimen/text_heading"
                     android:textStyle="bold" />

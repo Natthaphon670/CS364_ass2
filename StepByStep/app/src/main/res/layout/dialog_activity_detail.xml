@@ -14,6 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
+        android:text="ัวันที่/เดือน/เวลา"
         tools:text="วันที่/เดือน/เวลา"
         android:textColor="#FFFFFF"
         android:textSize="24sp" />
@@ -24,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
+        android:text="วันที่/เดือน/ปี • เวลา"
         tools:text="วันที่/เดือน/ปี • เวลา"
         android:textColor="#B3B3B3"
         android:textSize="14sp" />
@@ -35,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:drawablePadding="12dp"
+        android:text="0 steps"
         tools:text="0 steps"
         android:textColor="#4DD0E1"
         android:textSize="20sp"
@@ -47,6 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:drawablePadding="12dp"
+        android:text="0 shakes"
         tools:text="0 shakes"
         android:textColor="#B39DDB"
         android:textSize="20sp"
@@ -58,6 +62,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
+        android:text="Duration: 00:00"
         tools:text="Duration: 00:00"
         android:textColor="#FFFFFF"
         android:textSize="16sp" />
@@ -69,6 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:lineSpacingExtra="4dp"
+        android:text="Average:\n• 0.0 steps/min\n• 0.0 shakes/min"
         tools:text="Average:\n• 0.0 steps/min\n• 0.0 shakes/min"
         android:textColor="#FFFFFF"
         android:textSize="16sp" />
