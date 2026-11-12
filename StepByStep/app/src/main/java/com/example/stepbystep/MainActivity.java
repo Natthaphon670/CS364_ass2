@@ -9,11 +9,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -21,16 +22,21 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener { // เพิ่ม SensorEventListener[cite: 5]
+import com.google.android.material.button.MaterialButton;
+
+import java.util.Locale;
+
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private SensorManager sensorManager;
     private Sensor stepCounterSensor;
     private TextView tvCurrentSteps;
     private boolean isSensorPresent;
 
-    // ตัวแปรสำหรับคำนวณก้าว (TYPE_STEP_COUNTER คืนค่าก้าวสะสมตั้งแต่เปิดเครื่อง จึงต้องหาค่าเริ่มต้นมาลบออก)
+    // ตัวแปรสำหรับคำนวณก้าว (Session Delta)
     private int stepCount = 0;
     private float initialSteps = -1;
+    private float lastRawSteps = -1; // เก็บค่าดิบล่าสุดจากเซนเซอร์ไว้ใช้ตอนกดบันทึก/รีเซ็ต
 
     // ตัวแปรสำหรับการเขย่า
     private Sensor accelerometerSensor;
@@ -41,8 +47,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float currentAcceleration = SensorManager.GRAVITY_EARTH;
     private float lastAcceleration = SensorManager.GRAVITY_EARTH;
     private long lastShakeTime = 0;
-    // กำหนดค่าความแรงที่จะนับว่า "เขย่า" (ตัวเลขยิ่งมาก ยิ่งต้องออกแรงเขย่าเยอะ)
     private static final int SHAKE_THRESHOLD = 12;
+
+    // --- UI และตัวแปรสำหรับข้อ 3 (Session Delta) และ ข้อ 4 (Duration & Average) ---
+    private TextView tvDurationRate, tvStepsPerMin, tvShakesPerMin, tvCumulativeHistory;
+    private MaterialButton btnSaveActivity;
+
+    private long sessionStartTime = 0L;
+    private int cumulativeTotalSteps = 0; // ยอดสะสมเบื้องต้น (รอเชื่อม DBHelper ในสเต็ปถัดไป)
+    private final Handler timerHandler = new Handler(Looper.getMainLooper());
+    private Runnable timerRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +70,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return insets;
         });
 
-        // เชื่อมต่อ UI กับ TextView tvCurrentSteps
+        // เชื่อมต่อ UI ตาม ID ใน activity_main.xml
         tvCurrentSteps = findViewById(R.id.tvCurrentSteps);
         tvCurrentShakes = findViewById(R.id.tvCurrentShakes);
+        tvDurationRate = findViewById(R.id.tvDurationRate);
+        tvStepsPerMin = findViewById(R.id.tvStepsPerMin);
+        tvShakesPerMin = findViewById(R.id.tvShakesPerMin);
+        tvCumulativeHistory = findViewById(R.id.tvCumulativeHistory);
+        btnSaveActivity = findViewById(R.id.btnSaveActivity);
 
         // ขอสิทธิ์ ACTIVITY_RECOGNITION (จำเป็นสำหรับ Android 10 ขึ้นไป)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -77,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Toast.makeText(this, "เซนเซอร์นับก้าวไม่รองรับในอุปกรณ์นี้", Toast.LENGTH_LONG).show();
             isSensorPresent = false;
         }
+
         // ตรวจสอบเซนเซอร์ตรวจจับการเคลื่อนไหว
         if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
             accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -86,64 +106,126 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Toast.makeText(this, "เซนเซอร์ตรวจจับการเคลื่อนไหวไม่รองรับในอุปกรณ์นี้", Toast.LENGTH_LONG).show();
             isAccelerometerPresent = false;
         }
+
+        // ตั้งค่าตัวจับเวลาอัปเดตทุกๆ 1 วินาที (ข้อ 4: Duration & Average)
+        timerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                long elapsedMillis = System.currentTimeMillis() - sessionStartTime;
+                updateDurationAndAverage(elapsedMillis);
+                timerHandler.postDelayed(this, 1000);
+            }
+        };
+
+        // เริ่มต้นเซสชันแรกทันทีที่เปิดแอป
+        startNewSession();
+
+        // เมื่อกดปุ่ม "บันทึกกิจกรรม" -> บันทึกยอดและรีเซ็ตเซสชันใหม่ (ข้อ 3: Session Delta)
+        btnSaveActivity.setOnClickListener(v -> {
+            // เพิ่มยอดก้าวของเซสชันนี้เข้ายอดสะสม
+            cumulativeTotalSteps += stepCount;
+            tvCumulativeHistory.setText(String.valueOf(cumulativeTotalSteps));
+
+            Toast.makeText(this,
+                    String.format(Locale.getDefault(), "บันทึกกิจกรรมแล้ว: %d ก้าว, %d เขย่า", stepCount, shakeCount),
+                    Toast.LENGTH_SHORT).show();
+
+            // รีเซ็ตค่าทั้งหมดเพื่อเริ่มนับ Session ใหม่ (Delta ใหม่)
+            startNewSession();
+        });
+    }
+
+    // ฟังก์ชันเริ่ม/รีเซ็ตเซสชันใหม่ (ข้อ 3: Session Delta)
+    private void startNewSession() {
+        // ตั้งค่าจุดอ้างอิงก้าวใหม่ให้เท่ากับค่าล่าสุดจากเซนเซอร์ (ถ้าเคยรับค่ามาแล้ว) หรือ -1 เพื่อรอรับค่าแรก
+        initialSteps = lastRawSteps;
+        stepCount = 0;
+        shakeCount = 0;
+        sessionStartTime = System.currentTimeMillis();
+
+        // รีเซ็ตการแสดงผลบนหน้าจอ
+        if (isSensorPresent) tvCurrentSteps.setText("0");
+        if (isAccelerometerPresent) tvCurrentShakes.setText("0");
+        tvDurationRate.setText("00:00");
+        tvStepsPerMin.setText("0");
+        tvShakesPerMin.setText("0");
+
+        // รีสตาร์ทตัวจับเวลา
+        timerHandler.removeCallbacks(timerRunnable);
+        timerHandler.post(timerRunnable);
+    }
+
+    // ฟังก์ชันคำนวณเวลาและค่าเฉลี่ยต่อนาที (ข้อ 4: Duration & Average)
+    private void updateDurationAndAverage(long elapsedMillis) {
+        int totalSeconds = (int) (elapsedMillis / 1000);
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+
+        // แสดงเวลา MM:SS
+        tvDurationRate.setText(String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds));
+
+        // คำนวณค่าเฉลี่ยต่อนาที (ให้เริ่มคำนวณเมื่อผ่านไปอย่างน้อย 1 วินาที เพื่อไม่ให้ตัวเลขพุ่งผิดปกติในเสี้ยววินาทีแรก)
+        if (totalSeconds >= 1) {
+            double elapsedMinutes = elapsedMillis / 60000.0;
+            double avgSteps = stepCount / elapsedMinutes;
+            double avgShakes = shakeCount / elapsedMinutes;
+
+            tvStepsPerMin.setText(String.format(Locale.getDefault(), "%.1f", avgSteps));
+            tvShakesPerMin.setText(String.format(Locale.getDefault(), "%.1f", avgShakes));
+        } else {
+            tvStepsPerMin.setText("0");
+            tvShakesPerMin.setText("0");
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // ลงทะเบียน Listener เมื่อแอปทำงาน
         if (isSensorPresent) {
             sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_UI);
         }
-        // ลงทะเบียน Listener สำหรับ Accelerometer
         if (isAccelerometerPresent) {
             sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_UI);
         }
+        timerHandler.post(timerRunnable);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        // ยกเลิกการลงทะเบียน Listener เมื่อแอปอยู่เบื้องหลังเพื่อประหยัดแบตเตอรี่
         sensorManager.unregisterListener(this);
+        timerHandler.removeCallbacks(timerRunnable);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        // ตรวจสอบและแสดงจำนวนก้าวที่ตรวจจับได้
+        // 1. ตรวจสอบและแสดงจำนวนก้าวที่ตรวจจับได้ (Session Delta)
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            // เก็บค่าก้าวแรกสุดของเซสชันไว้ เพื่อให้จำนวนก้าวเริ่มต้นที่ 0
+            lastRawSteps = event.values[0];
             if (initialSteps == -1) {
-                initialSteps = event.values[0];
+                initialSteps = lastRawSteps;
             }
-
-            // คำนวณจำนวนก้าวใหม่
-            stepCount = (int) (event.values[0] - initialSteps);
-
-            // แสดงผลที่ tvCurrentSteps
+            stepCount = (int) (lastRawSteps - initialSteps);
             tvCurrentSteps.setText(String.valueOf(stepCount));
         }
 
-        // ส่วนของการตรวจจับการเขย่า
+        // 2. ส่วนของการตรวจจับการเขย่า
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             float x = event.values[0];
             float y = event.values[1];
             float z = event.values[2];
 
             lastAcceleration = currentAcceleration;
-            // คำนวณหาแรงเหวี่ยงรวม (ตัดค่าแรงโน้มถ่วงออก)
             currentAcceleration = (float) Math.sqrt((double) (x * x + y * y + z * z));
             float delta = currentAcceleration - lastAcceleration;
             acceleration = acceleration * 0.9f + delta;
 
-            // ถ้าแรงเหวี่ยงที่ได้ มากกว่า SHAKE_THRESHOLD จะถือว่ามีการเขย่า
             if (acceleration > SHAKE_THRESHOLD) {
                 long currentTime = System.currentTimeMillis();
-                // ป้องกันการนับรัวเกินไป (Debounce) เช่น กำหนดให้ห่างกันอย่างน้อย 400 มิลลิวินาที (0.4 วินาที)
                 if ((currentTime - lastShakeTime) > 400) {
                     lastShakeTime = currentTime;
-                    shakeCount++; // เพิ่มจำนวนการเขย่า
-                    tvCurrentShakes.setText(String.valueOf(shakeCount)); // แสดงผลที่หน้าจอ
+                    shakeCount++;
+                    tvCurrentShakes.setText(String.valueOf(shakeCount));
                 }
             }
         }
@@ -151,6 +233,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // ไม่ได้ใช้งานในส่วนนี้ แต่ต้องมีไว้ตาม interface SensorEventListener
+        // ไม่ได้ใช้งาน
     }
 }
