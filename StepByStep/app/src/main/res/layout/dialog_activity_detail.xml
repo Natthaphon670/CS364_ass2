@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#1E1E1E"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- หัวข้อ (วันที่และเวลาสั้น) -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        tools:text="วันที่/เดือน/เวลา"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp" />
+
+    <!-- ช่วงวันที่และเวลา -->
+    <TextView
+        android:id="@+id/tvDateRange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        tools:text="วันที่/เดือน/ปี • เวลา"
+        android:textColor="#B3B3B3"
+        android:textSize="14sp" />
+
+    <!-- จำนวนก้าว (สีฟ้า) -->
+    <TextView
+        android:id="@+id/tvSteps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:drawablePadding="12dp"
+        tools:text="0 steps"
+        android:textColor="#4DD0E1"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- จำนวนครั้งที่เขย่า (สีม่วง) -->
+    <TextView
+        android:id="@+id/tvShakes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:drawablePadding="12dp"
+        tools:text="0 shakes"
+        android:textColor="#B39DDB"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <!-- ระยะเวลา -->
+    <TextView
+        android:id="@+id/tvDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        tools:text="Duration: 00:00"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+
+    <!-- ค่าเฉลี่ย -->
+    <TextView
+        android:id="@+id/tvAverage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:lineSpacingExtra="4dp"
+        tools:text="Average:\n• 0.0 steps/min\n• 0.0 shakes/min"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+
+    <!-- แจ้งเตือนสถิติใหม่ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/badgeNewStep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:visibility="visible"
+            app:cardBackgroundColor="@color/bg_badge_yellow"
+            app:cardCornerRadius="@dimen/radius_small"
+            app:strokeWidth="0dp"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="@string/new_step_record"
+                android:textColor="@color/accent_yellow"
+                android:textSize="@dimen/text_small"
+                android:textStyle="bold" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/badgeNewShake"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible"
+            app:cardBackgroundColor="@color/bg_badge_yellow"
+            app:cardCornerRadius="@dimen/radius_small"
+            app:strokeWidth="0dp"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="@string/new_shake_record"
+                android:textColor="@color/accent_yellow"
+                android:textSize="@dimen/text_small"
+                android:textStyle="bold" />
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <!-- ปุ่มกดด้านล่าง -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- ปุ่มลบ (ซ้าย) -->
+        <Button
+            android:id="@+id/btnDelete"
+            style="?attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="@string/action_delete"
+            android:textColor="#80DEEA"
+            android:textSize="16sp" />
+
+        <!-- ปุ่มปิด (ขวา) -->
+        <Button
+            android:id="@+id/btnClose"
+            style="?attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:text="@string/action_close"
+            android:textColor="#80DEEA"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+</LinearLayout>

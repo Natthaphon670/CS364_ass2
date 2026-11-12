@@ -22,10 +22,10 @@
             android:id="@+id/tvHistoryTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="วันที่/เดือน/เวลา"
             android:textColor="@color/white"
             android:textSize="@dimen/text_heading_small"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="วันที่/เดือน/เวลา" />
 
         <!-- วันที่และเวลาแบบเต็ม -->
         <TextView
@@ -33,9 +33,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            tools:text="วันที่/เดือน/ปี • เวลา"
             android:textColor="@color/text_secondary"
-            android:textSize="@dimen/text_small" />
+            android:textSize="@dimen/text_small"
+            tools:text="วันที่/เดือน/ปี • เวลา" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -47,22 +47,22 @@
                 android:id="@+id/tvHistoryDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tools:text="0 steps • 0 shakes • 00:00 • 0 steps/min"
-                android:textColor="@color/accent_blue_cyan"
-                android:textSize="13sp"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@+id/ic_arrow"
-                android:layout_alignParentStart="true"/>
+                android:textColor="@color/accent_blue_cyan"
+                android:textSize="13sp"
+                tools:text="0 steps • 0 shakes • 00:00 • 0 steps/min" />
 
             <ImageView
                 android:id="@+id/ic_arrow"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:src="@android:drawable/ic_media_play"
-                app:tint="@color/text_secondary"
-                android:rotation="0"
                 android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true"
+                android:rotation="0"
+                android:src="@android:drawable/ic_media_play"
+                app:tint="@color/text_secondary" />
         </RelativeLayout>
 
         <LinearLayout
@@ -75,12 +75,13 @@
                 android:id="@+id/badgeNewStep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:visibility="visible"
                 app:cardBackgroundColor="@color/bg_badge_yellow"
                 app:cardCornerRadius="@dimen/radius_small"
                 app:strokeWidth="0dp"
-                android:layout_marginEnd="6dp"
-                android:visibility="visible"
                 tools:visibility="visible">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -96,11 +97,12 @@
                 android:id="@+id/badgeNewShake"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="visible"
                 app:cardBackgroundColor="@color/bg_badge_yellow"
                 app:cardCornerRadius="@dimen/radius_small"
                 app:strokeWidth="0dp"
-                android:visibility="visible"
                 tools:visibility="visible">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

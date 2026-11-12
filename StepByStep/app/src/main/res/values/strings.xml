@@ -19,4 +19,20 @@
     <string name="activity_history_title">ประวัติกิจกรรม</string>
     <string name="new_step_record">NEW STEP RECORD</string>
     <string name="new_shake_record">NEW SHAKE RECORD</string>
+
+    <!-- ปุ่มกด -->
+    <string name="action_delete">ลบ</string>
+    <string name="action_close">ปิด</string>
+
+    <!-- รูปแบบข้อความสำหรับรับค่าจาก Java -->
+    <string name="format_steps">%1$s steps</string>
+    <string name="format_shakes">%1$s shakes</string>
+    <string name="format_duration">Duration: %1$s</string>
+    <string name="format_average">Average:\n• %1$s steps/min\n• \%2$s shakes/min</string>
+
+    <!-- ข้อความแจ้งเตือนสถิติใหม่ (สามารถแยกใช้ตามเงื่อนไขใน Java ได้) -->
+    <string name="new_record_both">NEW STEP RECORD NEW SHAKE RECORD</string>
+    <string name="new_record_step">NEW STEP RECORD</string>
+    <string name="new_record_shake">NEW SHAKE RECORD</string>
+
 </resources>
