@@ -6,10 +6,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "stepbystep.db";
+    // อย่าเปลี่ยนเลขนี้ เพราะ onUpgrade จะ DROP TABLE ทำให้ประวัติหายทั้งหมด
     private static final int DATABASE_VERSION = 1;
 
 
@@ -114,7 +118,9 @@ public class DBHelper extends SQLiteOpenHelper {
         }
     }
 
-
+    // =====================================================================
+    // ข้อ 5: Total & New Record
+    // =====================================================================
 
     /** ยอดรวมจากประวัติทั้งหมด: [0] = ก้าวรวม, [1] = เขย่ารวม */
     public int[] getTotals() {
@@ -139,5 +145,83 @@ public class DBHelper extends SQLiteOpenHelper {
             if (c.moveToFirst()) return new int[]{c.getInt(0), c.getInt(1)};
         }
         return new int[]{0, 0};
+    }
+
+    // =====================================================================
+    // ข้อ 7: Query & Persistence
+    // =====================================================================
+
+    /** ดึงประวัติกิจกรรมทั้งหมด เรียงใหม่สุดก่อน */
+    public List<SessionRecord> getAllSessions() {
+        List<SessionRecord> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        try (Cursor c = db.query(TABLE_SESSIONS, null, null, null, null, null,
+                COL_START_TIME + " DESC, " + COL_ID + " DESC")) {
+            while (c.moveToNext()) {
+                list.add(new SessionRecord(
+                        c.getLong(c.getColumnIndexOrThrow(COL_ID)),
+                        c.getLong(c.getColumnIndexOrThrow(COL_START_TIME)),
+                        c.getLong(c.getColumnIndexOrThrow(COL_END_TIME)),
+                        c.getLong(c.getColumnIndexOrThrow(COL_DURATION_MS)),
+                        c.getInt(c.getColumnIndexOrThrow(COL_STEPS)),
+                        c.getInt(c.getColumnIndexOrThrow(COL_SHAKES)),
+                        c.getDouble(c.getColumnIndexOrThrow(COL_STEPS_PER_MIN)),
+                        c.getDouble(c.getColumnIndexOrThrow(COL_SHAKES_PER_MIN)),
+                        c.getInt(c.getColumnIndexOrThrow(COL_NEW_STEP_RECORD)) == 1,
+                        c.getInt(c.getColumnIndexOrThrow(COL_NEW_SHAKE_RECORD)) == 1));
+            }
+        }
+        return list;
+    }
+
+    // =====================================================================
+    // ข้อ 8: Delete & Recalculate
+    // =====================================================================
+
+    /**
+     * ลบกิจกรรมตาม id แล้วคำนวณ flag "สถิติใหม่" ของแถวที่เหลือใหม่
+     * ทำใน transaction เดียว คืน true ถ้าลบสำเร็จ
+     */
+    public boolean deleteSession(long id) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            int rows = db.delete(TABLE_SESSIONS, COL_ID + " = ?",
+                    new String[]{String.valueOf(id)});
+            if (rows > 0) {
+                recalculateRecordFlags(db);
+                db.setTransactionSuccessful();
+            }
+            return rows > 0;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    /** ไล่ตามลำดับเวลา แล้วตั้ง flag สถิติใหม่ตามกติกาเดียวกับ insertSession */
+    private static void recalculateRecordFlags(SQLiteDatabase db) {
+        int maxSteps = 0;
+        int maxShakes = 0;
+        try (Cursor c = db.query(TABLE_SESSIONS,
+                new String[]{COL_ID, COL_STEPS, COL_SHAKES},
+                null, null, null, null,
+                COL_START_TIME + " ASC, " + COL_ID + " ASC")) {
+            while (c.moveToNext()) {
+                long id = c.getLong(0);
+                int steps = c.getInt(1);
+                int shakes = c.getInt(2);
+
+                boolean newStep = steps > 0 && steps > maxSteps;
+                boolean newShake = shakes > 0 && shakes > maxShakes;
+                if (newStep) maxSteps = steps;
+                if (newShake) maxShakes = shakes;
+
+                ContentValues cv = new ContentValues();
+                cv.put(COL_NEW_STEP_RECORD, newStep ? 1 : 0);
+                cv.put(COL_NEW_SHAKE_RECORD, newShake ? 1 : 0);
+                db.update(TABLE_SESSIONS, cv, COL_ID + " = ?",
+                        new String[]{String.valueOf(id)});
+            }
+        }
     }
 }

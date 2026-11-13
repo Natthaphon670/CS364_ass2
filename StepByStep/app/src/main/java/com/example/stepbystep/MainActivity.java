@@ -15,12 +15,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -60,6 +63,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private Runnable timerRunnable;
 
+    // --- ข้อ 7 (Query & Persistence) และ ข้อ 8 (Delete & Recalculate) ---
+    private RecyclerView rvActivityHistory;
+    private ActivityAdapter activityAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,9 +88,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         tvCumulativeHistory = findViewById(R.id.tvCumulativeHistory);
         btnSaveActivity = findViewById(R.id.btnSaveActivity);
 
-        // ข้อ 6: เปิดฐานข้อมูล SQLite / ข้อ 5: แสดงยอดรวมจากประวัติที่บันทึกไว้
+        // ข้อ 6: เปิดฐานข้อมูล SQLite
         dbHelper = new DBHelper(this);
-        refreshTotals();
+
+        // ข้อ 7: ตั้งค่า RecyclerView แสดงประวัติกิจกรรม (กดการ์ดเพื่อดูรายละเอียด/ลบ)
+        rvActivityHistory = findViewById(R.id.rvActivityHistory);
+        rvActivityHistory.setLayoutManager(new LinearLayoutManager(this));
+        activityAdapter = new ActivityAdapter(this::showItemDialog);
+        rvActivityHistory.setAdapter(activityAdapter);
+
+        // ข้อ 7 + ข้อ 5: โหลดประวัติและยอดรวมจากฐานข้อมูลทุกครั้งที่เปิดแอป
+        refreshAll();
 
         // ขอสิทธิ์ ACTIVITY_RECOGNITION (จำเป็นสำหรับ Android 10 ขึ้นไป)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -159,8 +174,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return;
         }
 
-        // ข้อ 5: ยอดรวมคำนวณจาก SUM ในฐานข้อมูล จึงถูกต้องเสมอแม้ปิด-เปิดแอปหรือมีการลบรายการ
-        refreshTotals();
+        // ข้อ 5/7: โหลดรายการประวัติและยอดรวมใหม่จากฐานข้อมูล
+        refreshAll();
 
         StringBuilder msg = new StringBuilder(String.format(Locale.getDefault(),
                 "บันทึกกิจกรรมแล้ว: %d ก้าว, %d เขย่า", steps, shakes));
@@ -169,10 +184,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Toast.makeText(this, msg.toString(),
                 (result.isNewStepRecord || result.isNewShakeRecord) ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
 
-        // TODO(ข้อ 7/9): โหลดรายการประวัติใหม่ให้ RecyclerView ตรงนี้
-
         // รีเซ็ตค่าทั้งหมดเพื่อเริ่มนับ Session ใหม่ (Delta ใหม่)
         startNewSession();
+    }
+
+    // =====================================================================
+    // ข้อ 7: Query & Persistence
+    // =====================================================================
+
+    // โหลดรายการประวัติ + ยอดรวมจากฐานข้อมูล (ใช้ฐานข้อมูลเป็นแหล่งข้อมูลหลักเสมอ)
+    private void refreshAll() {
+        activityAdapter.submit(dbHelper.getAllSessions());
+        refreshTotals();
     }
 
     // ข้อ 5: แสดงยอดรวมก้าว/เขย่าจากประวัติทั้งหมดในฐานข้อมูล
@@ -180,6 +203,36 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         int[] totals = dbHelper.getTotals();
         tvCumulativeHistory.setText(String.format(Locale.getDefault(),
                 "%d ก้าว • %d เขย่า", totals[0], totals[1]));
+    }
+
+    // =====================================================================
+    // ข้อ 8: Delete & Recalculate
+    // =====================================================================
+
+    // กดการ์ดประวัติ -> แสดงรายละเอียด พร้อมปุ่ม ลบ / ปิด
+    private void showItemDialog(SessionRecord r) {
+        long totalSec = r.durationMs / 1000;
+        String message = String.format(Locale.getDefault(),
+                "%d steps • %d shakes\nDuration: %02d:%02d\n%.1f steps/min • %.1f shakes/min",
+                r.steps, r.shakes, totalSec / 60, totalSec % 60,
+                r.stepsPerMin, r.shakesPerMin);
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.activity_history_title)
+                .setMessage(message)
+                .setPositiveButton(R.string.action_delete, (d, w) -> deleteSession(r))
+                .setNegativeButton(R.string.action_close, null)
+                .show();
+    }
+
+    // ลบจากฐานข้อมูลจริง แล้วโหลดรายการ ยอดรวม และป้ายสถิติใหม่ (คำนวณใหม่ใน DBHelper)
+    private void deleteSession(SessionRecord r) {
+        if (dbHelper.deleteSession(r.id)) {
+            refreshAll();
+            Toast.makeText(this, "ลบกิจกรรมแล้ว", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "ลบกิจกรรมไม่สำเร็จ", Toast.LENGTH_LONG).show();
+        }
     }
 
     // ฟังก์ชันเริ่ม/รีเซ็ตเซสชันใหม่ (ข้อ 3: Session Delta)
@@ -234,6 +287,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (isAccelerometerPresent) {
             sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_UI);
         }
+        // กัน runnable ซ้อนกัน (startNewSession() ก็ post ไว้แล้วตอน onCreate)
+        timerHandler.removeCallbacks(timerRunnable);
         timerHandler.post(timerRunnable);
     }
 
