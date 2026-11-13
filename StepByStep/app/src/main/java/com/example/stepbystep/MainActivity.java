@@ -54,7 +54,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private MaterialButton btnSaveActivity;
 
     private long sessionStartTime = 0L;
-    private int cumulativeTotalSteps = 0; // ยอดสะสมเบื้องต้น (รอเชื่อม DBHelper ในสเต็ปถัดไป)
+
+    // --- ข้อ 5 (Total & New Record) และ ข้อ 6 (Insert Session) ---
+    private DBHelper dbHelper;
     private final Handler timerHandler = new Handler(Looper.getMainLooper());
     private Runnable timerRunnable;
 
@@ -78,6 +80,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         tvShakesPerMin = findViewById(R.id.tvShakesPerMin);
         tvCumulativeHistory = findViewById(R.id.tvCumulativeHistory);
         btnSaveActivity = findViewById(R.id.btnSaveActivity);
+
+        // ข้อ 6: เปิดฐานข้อมูล SQLite / ข้อ 5: แสดงยอดรวมจากประวัติที่บันทึกไว้
+        dbHelper = new DBHelper(this);
+        refreshTotals();
 
         // ขอสิทธิ์ ACTIVITY_RECOGNITION (จำเป็นสำหรับ Android 10 ขึ้นไป)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -120,19 +126,60 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // เริ่มต้นเซสชันแรกทันทีที่เปิดแอป
         startNewSession();
 
-        // เมื่อกดปุ่ม "บันทึกกิจกรรม" -> บันทึกยอดและรีเซ็ตเซสชันใหม่ (ข้อ 3: Session Delta)
-        btnSaveActivity.setOnClickListener(v -> {
-            // เพิ่มยอดก้าวของเซสชันนี้เข้ายอดสะสม
-            cumulativeTotalSteps += stepCount;
-            tvCumulativeHistory.setText(String.valueOf(cumulativeTotalSteps));
+        // เมื่อกดปุ่ม "บันทึกกิจกรรม" -> บันทึกลง SQLite (ข้อ 6) อัปเดตยอดรวม/สถิติ (ข้อ 5) แล้วเริ่มเซสชันใหม่ (ข้อ 3)
+        btnSaveActivity.setOnClickListener(v -> saveCurrentSession());
+    }
 
-            Toast.makeText(this,
-                    String.format(Locale.getDefault(), "บันทึกกิจกรรมแล้ว: %d ก้าว, %d เขย่า", stepCount, shakeCount),
-                    Toast.LENGTH_SHORT).show();
+    // =====================================================================
+    // ข้อ 6: Insert Session + ข้อ 5: Total & New Record
+    // =====================================================================
+    private void saveCurrentSession() {
+        // snapshot ค่าของเซสชันก่อน เพราะ onSensorChanged อาจอัปเดตตัวแปรระหว่างทำงาน
+        final int steps = stepCount;
+        final int shakes = shakeCount;
+        final long endTime = System.currentTimeMillis();
+        final long durationMs = Math.max(0L, endTime - sessionStartTime);
 
-            // รีเซ็ตค่าทั้งหมดเพื่อเริ่มนับ Session ใหม่ (Delta ใหม่)
-            startNewSession();
-        });
+        if (steps <= 0 && shakes <= 0) {
+            Toast.makeText(this, "ยังไม่มีก้าวหรือการเขย่าในกิจกรรมนี้", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // ค่าเฉลี่ยต่อนาที ใช้สูตรเดียวกับ updateDurationAndAverage() (ต่ำกว่า 1 วินาทีถือเป็น 0)
+        double minutes = durationMs / 60000.0;
+        double stepsPerMin = durationMs >= 1000 ? steps / minutes : 0.0;
+        double shakesPerMin = durationMs >= 1000 ? shakes / minutes : 0.0;
+
+        DBHelper.InsertResult result = dbHelper.insertSession(
+                sessionStartTime, endTime, durationMs, steps, shakes, stepsPerMin, shakesPerMin);
+
+        if (!result.isSuccess()) {
+            // insert ล้มเหลว: ไม่รีเซ็ตเซสชัน เพื่อให้ผู้ใช้กดบันทึกซ้ำได้โดยข้อมูลไม่หาย
+            Toast.makeText(this, "บันทึกกิจกรรมไม่สำเร็จ", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // ข้อ 5: ยอดรวมคำนวณจาก SUM ในฐานข้อมูล จึงถูกต้องเสมอแม้ปิด-เปิดแอปหรือมีการลบรายการ
+        refreshTotals();
+
+        StringBuilder msg = new StringBuilder(String.format(Locale.getDefault(),
+                "บันทึกกิจกรรมแล้ว: %d ก้าว, %d เขย่า", steps, shakes));
+        if (result.isNewStepRecord) msg.append("\n").append(getString(R.string.new_step_record));
+        if (result.isNewShakeRecord) msg.append("\n").append(getString(R.string.new_shake_record));
+        Toast.makeText(this, msg.toString(),
+                (result.isNewStepRecord || result.isNewShakeRecord) ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
+
+        // TODO(ข้อ 7/9): โหลดรายการประวัติใหม่ให้ RecyclerView ตรงนี้
+
+        // รีเซ็ตค่าทั้งหมดเพื่อเริ่มนับ Session ใหม่ (Delta ใหม่)
+        startNewSession();
+    }
+
+    // ข้อ 5: แสดงยอดรวมก้าว/เขย่าจากประวัติทั้งหมดในฐานข้อมูล
+    private void refreshTotals() {
+        int[] totals = dbHelper.getTotals();
+        tvCumulativeHistory.setText(String.format(Locale.getDefault(),
+                "%d ก้าว • %d เขย่า", totals[0], totals[1]));
     }
 
     // ฟังก์ชันเริ่ม/รีเซ็ตเซสชันใหม่ (ข้อ 3: Session Delta)
@@ -195,6 +242,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onPause();
         sensorManager.unregisterListener(this);
         timerHandler.removeCallbacks(timerRunnable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (dbHelper != null) dbHelper.close();
     }
 
     @Override
