@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cardHistoryItem"
+    android:clickable="true"
+    android:focusable="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/space_medium"
@@ -25,7 +27,7 @@
             android:textColor="@color/white"
             android:textSize="@dimen/text_heading_small"
             android:textStyle="bold"
-            android:text="วันที่/เดือน/เวลา"
+
             tools:text="วันที่/เดือน/เวลา" />
 
         <!-- วันที่และเวลาแบบเต็ม -->
@@ -36,13 +38,13 @@
             android:layout_marginTop="2dp"
             android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_small"
-            android:text="วันที่/เดือน/ปี • เวลา"
+
             tools:text="วันที่/เดือน/ปี • เวลา" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="@dimen/space_small_plus">
 
             <!-- รายละเอียด ก้าว เขย่า เวลา อัตราเฉลี่ย -->
             <TextView
@@ -53,33 +55,34 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@+id/ic_arrow"
                 android:textColor="@color/accent_blue_cyan"
-                android:textSize="13sp"
-                android:text="0 steps • 0 shakes • 00:00 • 0 steps/min"
+                android:textSize="@dimen/text_body_small"
+
                 tools:text="0 steps • 0 shakes • 00:00 • 0 steps/min" />
 
             <ImageView
                 android:id="@+id/ic_arrow"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="@dimen/space_large"
+                android:layout_height="@dimen/space_large"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:rotation="0"
                 android:src="@android:drawable/ic_media_play"
+                android:importantForAccessibility="no"
                 app:tint="@color/text_secondary" />
         </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="@dimen/space_medium"
             android:orientation="horizontal">
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/badgeNewStep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:visibility="visible"
+                android:layout_marginEnd="@dimen/space_small"
+                android:visibility="gone"
                 app:cardBackgroundColor="@color/bg_badge_yellow"
                 app:cardCornerRadius="@dimen/radius_small"
                 app:strokeWidth="0dp"
@@ -88,8 +91,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="@dimen/space_small_plus"
+                    android:paddingVertical="@dimen/space_xsmall"
                     android:text="@string/new_step_record"
                     android:textColor="@color/accent_yellow"
                     android:textSize="@dimen/text_xsmall"
@@ -100,7 +103,7 @@
                 android:id="@+id/badgeNewShake"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:cardBackgroundColor="@color/bg_badge_yellow"
                 app:cardCornerRadius="@dimen/radius_small"
                 app:strokeWidth="0dp"
@@ -109,8 +112,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="@dimen/space_small_plus"
+                    android:paddingVertical="@dimen/space_xsmall"
                     android:text="@string/new_shake_record"
                     android:textColor="@color/accent_yellow"
                     android:textSize="@dimen/text_xsmall"

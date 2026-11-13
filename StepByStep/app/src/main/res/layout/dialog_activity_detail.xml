@@ -1,45 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#1E1E1E"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="@color/card"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
 
     <!-- หัวข้อ (วันที่และเวลาสั้น) -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="ัวันที่/เดือน/เวลา"
+        android:layout_marginBottom="@dimen/space_large"
         tools:text="วันที่/เดือน/เวลา"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp" />
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_value_medium" />
 
     <!-- ช่วงวันที่และเวลา -->
     <TextView
         android:id="@+id/tvDateRange"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="วันที่/เดือน/ปี • เวลา"
+        android:layout_marginBottom="@dimen/space_large"
+
         tools:text="วันที่/เดือน/ปี • เวลา"
-        android:textColor="#B3B3B3"
-        android:textSize="14sp" />
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_body" />
 
     <!-- จำนวนก้าว (สีฟ้า) -->
     <TextView
         android:id="@+id/tvSteps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:drawablePadding="12dp"
-        android:text="0 steps"
+        android:layout_marginBottom="@dimen/space_small_plus"
+        android:drawablePadding="@dimen/space_medium"
+
         tools:text="0 steps"
-        android:textColor="#4DD0E1"
+        android:textColor="@color/accent_blue_cyan"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -48,11 +52,11 @@
         android:id="@+id/tvShakes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:drawablePadding="12dp"
-        android:text="0 shakes"
+        android:layout_marginBottom="@dimen/space_large"
+        android:drawablePadding="@dimen/space_medium"
+
         tools:text="0 shakes"
-        android:textColor="#B39DDB"
+        android:textColor="@color/accent_purple"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -61,10 +65,10 @@
         android:id="@+id/tvDuration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:text="Duration: 00:00"
+        android:layout_marginBottom="@dimen/space_medium"
+
         tools:text="Duration: 00:00"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_primary"
         android:textSize="16sp" />
 
     <!-- ค่าเฉลี่ย -->
@@ -72,26 +76,26 @@
         android:id="@+id/tvAverage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:lineSpacingExtra="4dp"
-        android:text="Average:\n• 0.0 steps/min\n• 0.0 shakes/min"
+        android:layout_marginBottom="@dimen/space_large"
+        android:lineSpacingExtra="@dimen/space_xsmall"
+
         tools:text="Average:\n• 0.0 steps/min\n• 0.0 shakes/min"
-        android:textColor="#FFFFFF"
+        android:textColor="@color/text_primary"
         android:textSize="16sp" />
 
     <!-- แจ้งเตือนสถิติใหม่ -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="@dimen/space_medium"
         android:orientation="horizontal">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/badgeNewStep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="6dp"
-            android:visibility="visible"
+            android:layout_marginEnd="@dimen/space_small"
+            android:visibility="gone"
             app:cardBackgroundColor="@color/bg_badge_yellow"
             app:cardCornerRadius="@dimen/radius_small"
             app:strokeWidth="0dp"
@@ -100,8 +104,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
+                android:paddingHorizontal="@dimen/space_small_plus"
+                android:paddingVertical="@dimen/space_xsmall"
                 android:text="@string/new_step_record"
                 android:textColor="@color/accent_yellow"
                 android:textSize="@dimen/text_small"
@@ -112,7 +116,7 @@
             android:id="@+id/badgeNewShake"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="visible"
+            android:visibility="gone"
             app:cardBackgroundColor="@color/bg_badge_yellow"
             app:cardCornerRadius="@dimen/radius_small"
             app:strokeWidth="0dp"
@@ -121,8 +125,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
+                android:paddingHorizontal="@dimen/space_small_plus"
+                android:paddingVertical="@dimen/space_xsmall"
                 android:text="@string/new_shake_record"
                 android:textColor="@color/accent_yellow"
                 android:textSize="@dimen/text_small"
@@ -143,7 +147,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:text="@string/action_delete"
-            android:textColor="#80DEEA"
+            android:textColor="@color/accent_blue_cyan"
             android:textSize="16sp" />
 
         <!-- ปุ่มปิด (ขวา) -->
@@ -154,8 +158,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:text="@string/action_close"
-            android:textColor="#80DEEA"
+            android:textColor="@color/accent_blue_cyan"
             android:textSize="16sp" />
     </RelativeLayout>
 
 </LinearLayout>
+</ScrollView>

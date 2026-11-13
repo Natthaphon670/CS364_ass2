@@ -11,6 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +30,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -66,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // --- ข้อ 7 (Query & Persistence) และ ข้อ 8 (Delete & Recalculate) ---
     private RecyclerView rvActivityHistory;
     private ActivityAdapter activityAdapter;
+    private TextView tvEmptyHistory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +102,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         rvActivityHistory.setLayoutManager(new LinearLayoutManager(this));
         activityAdapter = new ActivityAdapter(this::showItemDialog);
         rvActivityHistory.setAdapter(activityAdapter);
+
+        // ข้อ 10: เพิ่ม Empty State โดยไม่ต้องแก้ activity_main.xml
+        ViewGroup historyParent = (ViewGroup) rvActivityHistory.getParent();
+        tvEmptyHistory = new TextView(this);
+        tvEmptyHistory.setText("ยังไม่มีประวัติกิจกรรม");
+        tvEmptyHistory.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+        tvEmptyHistory.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,
+                getResources().getDimension(R.dimen.text_body));
+        tvEmptyHistory.setGravity(android.view.Gravity.CENTER);
+        int padding = getResources().getDimensionPixelSize(R.dimen.space_large);
+        tvEmptyHistory.setPadding(padding, padding, padding, padding);
+        historyParent.addView(tvEmptyHistory, historyParent.indexOfChild(rvActivityHistory) + 1,
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
 
         // ข้อ 7 + ข้อ 5: โหลดประวัติและยอดรวมจากฐานข้อมูลทุกครั้งที่เปิดแอป
         refreshAll();
@@ -195,6 +215,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // โหลดรายการประวัติ + ยอดรวมจากฐานข้อมูล (ใช้ฐานข้อมูลเป็นแหล่งข้อมูลหลักเสมอ)
     private void refreshAll() {
         activityAdapter.submit(dbHelper.getAllSessions());
+        boolean isEmpty = activityAdapter.getItemCount() == 0;
+        rvActivityHistory.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
+        tvEmptyHistory.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
         refreshTotals();
     }
 
@@ -211,18 +234,41 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     // กดการ์ดประวัติ -> แสดงรายละเอียด พร้อมปุ่ม ลบ / ปิด
     private void showItemDialog(SessionRecord r) {
+        // ข้อ 10: ใช้ layout รายละเอียดจริง และเติมค่าจากรายการที่แตะ
+        View detail = getLayoutInflater().inflate(R.layout.dialog_activity_detail, null);
+        SimpleDateFormat titleFormat = new SimpleDateFormat("dd MMM HH:mm", Locale.ENGLISH);
+        SimpleDateFormat fullFormat = new SimpleDateFormat("dd/MM/yyyy • HH:mm", Locale.ENGLISH);
+        Date start = new Date(r.startTime);
+        Date end = new Date(r.endTime);
         long totalSec = r.durationMs / 1000;
-        String message = String.format(Locale.getDefault(),
-                "%d steps • %d shakes\nDuration: %02d:%02d\n%.1f steps/min • %.1f shakes/min",
-                r.steps, r.shakes, totalSec / 60, totalSec % 60,
-                r.stepsPerMin, r.shakesPerMin);
 
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.activity_history_title)
-                .setMessage(message)
-                .setPositiveButton(R.string.action_delete, (d, w) -> deleteSession(r))
-                .setNegativeButton(R.string.action_close, null)
-                .show();
+        ((TextView) detail.findViewById(R.id.tvTitle)).setText(titleFormat.format(start));
+        ((TextView) detail.findViewById(R.id.tvDateRange)).setText(
+                fullFormat.format(start) + " – " + fullFormat.format(end));
+        ((TextView) detail.findViewById(R.id.tvSteps)).setText(
+                getString(R.string.format_steps, String.valueOf(r.steps)));
+        ((TextView) detail.findViewById(R.id.tvShakes)).setText(
+                getString(R.string.format_shakes, String.valueOf(r.shakes)));
+        ((TextView) detail.findViewById(R.id.tvDuration)).setText(
+                getString(R.string.format_duration,
+                        String.format(Locale.getDefault(), "%02d:%02d", totalSec / 60, totalSec % 60)));
+        ((TextView) detail.findViewById(R.id.tvAverage)).setText(
+                String.format(Locale.getDefault(),
+                        getString(R.string.format_average).replace("\\%", "%"),
+                        String.format(Locale.getDefault(), "%.1f", r.stepsPerMin),
+                        String.format(Locale.getDefault(), "%.1f", r.shakesPerMin)));
+        detail.findViewById(R.id.badgeNewStep).setVisibility(r.isNewStepRecord ? View.VISIBLE : View.GONE);
+        detail.findViewById(R.id.badgeNewShake).setVisibility(r.isNewShakeRecord ? View.VISIBLE : View.GONE);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(detail)
+                .create();
+        detail.findViewById(R.id.btnClose).setOnClickListener(v -> dialog.dismiss());
+        detail.findViewById(R.id.btnDelete).setOnClickListener(v -> {
+            dialog.dismiss();
+            deleteSession(r);
+        });
+        dialog.show();
     }
 
     // ลบจากฐานข้อมูลจริง แล้วโหลดรายการ ยอดรวม และป้ายสถิติใหม่ (คำนวณใหม่ใน DBHelper)

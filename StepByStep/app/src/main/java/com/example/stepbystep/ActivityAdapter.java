@@ -56,15 +56,26 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.VH> {
         h.tvDateFull.setText(fullFormat.format(start));
 
         long totalSec = r.durationMs / 1000;
-        h.tvDetails.setText(String.format(Locale.getDefault(),
-                "%d steps • %d shakes • %02d:%02d • %.1f steps/min",
-                r.steps, r.shakes, totalSec / 60, totalSec % 60, r.stepsPerMin));
+        android.content.Context context = h.itemView.getContext();
+        String steps = context.getString(R.string.format_steps, String.valueOf(r.steps));
+        String shakes = context.getString(R.string.format_shakes, String.valueOf(r.shakes));
+        String duration = String.format(Locale.getDefault(), "%02d:%02d",
+                totalSec / 60, totalSec % 60);
+        String rate = context.getString(R.string.format_steps,
+                String.format(Locale.getDefault(), "%.1f", r.stepsPerMin)) + "/min";
+        h.tvDetails.setText(steps + " • " + shakes + " • " + duration + " • " + rate);
 
-        // layout ตั้งค่าเริ่มต้นเป็น visible จึงต้องกำหนดทุกครั้ง
+
         h.badgeNewStep.setVisibility(r.isNewStepRecord ? View.VISIBLE : View.GONE);
         h.badgeNewShake.setVisibility(r.isNewShakeRecord ? View.VISIBLE : View.GONE);
 
-        h.card.setOnClickListener(v -> listener.onItemClick(r));
+
+        h.card.setOnClickListener(v -> {
+            int clickedPosition = h.getAdapterPosition();
+            if (listener != null && clickedPosition != RecyclerView.NO_POSITION) {
+                listener.onItemClick(items.get(clickedPosition));
+            }
+        });
     }
 
     @Override
